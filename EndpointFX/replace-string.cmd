@@ -1,5 +1,5 @@
 @echo off
-setlocal enabledelayedexpansion
+setlocal
 
 if "%~1"=="" (
     echo Usage: %~nx0 {replacement_string}
@@ -8,7 +8,7 @@ if "%~1"=="" (
 
 set "replacement_string=%~1"
 
-set "input_file=input.txt"
+set "input_file=FxProperties-base.txt"
 set "output_file=output.txt"
 
 if not exist "%input_file%" (
@@ -16,12 +16,6 @@ if not exist "%input_file%" (
     exit /b 1
 )
 
-if exist "%output_file%" del "%output_file%"
-
-for /f "usebackq delims=" %%A in ("%input_file%") do (
-    set "line=%%A"
-    set "line=!line:{EndpointIDString}=%replacement_string%!"
-    echo !line! >> "%output_file%"
-)
+powershell -Command "Get-Content %input_file% | ForEach-Object { $_ -replace '{EndpointIDString}', '%replacement_string%' } | Set-Content %output_file%"
 
 echo Replacement complete. Output written to "%output_file%".
